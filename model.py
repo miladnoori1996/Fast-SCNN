@@ -99,10 +99,9 @@ def ppm(input_tensor, bin_sizes):
     return tf.keras.layers.concatenate(concat_list)
 
 
-NO_OF_TRAINING_IMAGES = len(grouping('train')[0])
-NO_OF_VAL_IMAGES = len(grouping('val')[0])
+
 NO_OF_EPOCHS = 10
-BATCH_SIZE = 32
+BATCH_SIZE = 10
 
 
 
