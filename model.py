@@ -146,9 +146,9 @@ fast_scnn_model.summary()
 # val_gen = data_gen('val', BATCH_SIZE, split=True, data=BATCH_SIZE)
 # test_gen = data_gen('test', BATCH_SIZE, split=True, data=BATCH_SIZE)
 
-train_gen = DataGen('train', batch_size=BATCH_SIZE, split=True, amount=2*BATCH_SIZE)
-val_gen = DataGen('val', batch_size=BATCH_SIZE, split=True, amount=2*BATCH_SIZE)
-test_gen = DataGen('test', batch_size=BATCH_SIZE, split=True, amount=2*BATCH_SIZE)
+train_gen = DataGen('train', batch_size=BATCH_SIZE)
+val_gen = DataGen('val', batch_size=BATCH_SIZE)
+
 
 train_steps = len(train_gen)
 valid_steps = len(val_gen)
