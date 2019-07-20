@@ -88,7 +88,8 @@ class DataGen(keras.utils.Sequence):
 
         mask_img = cv2.imread(mask_path, 1)
         mask_img = cv2.cvtColor(mask_img, cv2.COLOR_BGR2RGB)
-        masking = np.zeros((1024, 2048, 21))
+        mask_img = cv2.resize(mask_img, (self.image_height, self.image_width))
+        masking = np.zeros((self.image_width, self.image_height, 21))
         count = 0
         for trian_id in LABEL_SORTED_TRAIN_ID:
             lis = []
@@ -115,8 +116,8 @@ class DataGen(keras.utils.Sequence):
             self.batch_size = len(ids) - index*self.batch_size
         files_batch = ids[index*self.batch_size : (index+1)*self.batch_size]
 
-        image = np.zeros((self.batch_size, 1024, 2048, 3))
-        mask = np.zeros((self.batch_size, 1024, 2048, 21))
+        image = np.zeros((self.batch_size, self.image_width, self.image_height, 3))
+        mask = np.zeros((self.batch_size, self.image_width, self.image_height, 21))
         count = 0
         for id_name in files_batch:
             # print("getting in the loop : ", count)
