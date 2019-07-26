@@ -110,6 +110,8 @@ class DataGen(keras.utils.Sequence):
             print("mode does not exist")
             return
 
+        print(image_path)
+        print(mask_path)
         _image = image.img_to_array(image.load_img(image_path, target_size=(self.image_height, self.image_width)))/255.
         _mask = image.img_to_array(image.load_img(mask_path, color_mode="grayscale", target_size=(self.image_height, self.image_width)))
         mask = np.zeros((_mask.shape[0], _mask.shape[1], 21))
@@ -131,31 +133,31 @@ class DataGen(keras.utils.Sequence):
             elif i in CATEGORIES['trainId-6']:
                 mask[:,:,7] = np.logical_or(mask[:,:,7],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-7']:
-                mask[:,:,7] = np.logical_or(mask[:,:,8],(_mask[:,:,0]==i))
+                mask[:,:,8] = np.logical_or(mask[:,:,8],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-8']:
-                mask[:,:,1] = np.logical_or(mask[:,:,9],(_mask[:,:,0]==i))
+                mask[:,:,9] = np.logical_or(mask[:,:,9],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-9']:
-                mask[:,:,2] = np.logical_or(mask[:,:,10],(_mask[:,:,0]==i))
+                mask[:,:,10] = np.logical_or(mask[:,:,10],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-10']:
-                mask[:,:,3] = np.logical_or(mask[:,:,11],(_mask[:,:,0]==i))
+                mask[:,:,11] = np.logical_or(mask[:,:,11],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-11']:
-                mask[:,:,4] = np.logical_or(mask[:,:,12],(_mask[:,:,0]==i))
+                mask[:,:,12] = np.logical_or(mask[:,:,12],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-12']:
-                mask[:,:,5] = np.logical_or(mask[:,:,13],(_mask[:,:,0]==i))
+                mask[:,:,13] = np.logical_or(mask[:,:,13],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-13']:
-                mask[:,:,6] = np.logical_or(mask[:,:,14],(_mask[:,:,0]==i))
+                mask[:,:,14] = np.logical_or(mask[:,:,14],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-14']:
-                mask[:,:,7] = np.logical_or(mask[:,:,15],(_mask[:,:,0]==i))
+                mask[:,:,15] = np.logical_or(mask[:,:,15],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-15']:
-                mask[:,:,7] = np.logical_or(mask[:,:,16],(_mask[:,:,0]==i))
+                mask[:,:,16] = np.logical_or(mask[:,:,16],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-16']:
-                mask[:,:,3] = np.logical_or(mask[:,:,17],(_mask[:,:,0]==i))
+                mask[:,:,17] = np.logical_or(mask[:,:,17],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-17']:
-                mask[:,:,4] = np.logical_or(mask[:,:,18],(_mask[:,:,0]==i))
+                mask[:,:,18] = np.logical_or(mask[:,:,18],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-18']:
-                mask[:,:,5] = np.logical_or(mask[:,:,19],(_mask[:,:,0]==i))
+                mask[:,:,19] = np.logical_or(mask[:,:,19],(_mask[:,:,0]==i))
             elif i in CATEGORIES['trainId-19']:
-                mask[:,:,6] = np.logical_or(mask[:,:,20],(_mask[:,:,0]==i))
+                mask[:,:,20] = np.logical_or(mask[:,:,20],(_mask[:,:,0]==i))
         return _image, mask
 
     def __getitem__(self, index):
@@ -219,11 +221,16 @@ class DataGen(keras.utils.Sequence):
 
 
 
-# dg = DataGen('train', batch_size=2, split=True, amount=10)
-# i, m = dg.__getitem__(4)
-# print(m[0][:,:,0].shape)
-# print(type(m))
-# cvuint8 = cv2.convertScaleAbs(m[0][:,:,0])
+dg = DataGen('train', batch_size=2)
+i, m = dg.__getitem__(2)
+print(m[0][:,:,0].shape)
+print(type(m))
+cvuint8 = cv2.convertScaleAbs(m[0][:,:,4])
+for i in range(0, 21):
+    print(np.unique(m[0][:,:,i]))
+
+
+# cvuint8 = cv2.convertScaleAbs(i[0])
 # cv2.imshow("hi", cvuint8)
 # cv2.waitKey(0)
 
