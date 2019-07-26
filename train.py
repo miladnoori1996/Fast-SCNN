@@ -2,12 +2,8 @@ import os
 import tensorflow as tf
 import numpy as np
 from model import conv_layer, bottelneck, ppm
-from data_gen1 import get_tf_dataset
 from new_datagen import DataGen
 
-# curl -o train.py https://transfer.sh/xsJE2/train.py
-# curl -o model.py https://transfer.sh/vO2oH/model.py
-# curl -o 
 
 NO_OF_EPOCHS = 1000
 BATCH_SIZE = 2
@@ -17,7 +13,7 @@ VAL_SAMPLES = 500
 
 
 # input image
-input_layer = tf.keras.layers.Input(shape=(1024, 2048, 3))
+input_layer = tf.keras.layers.Input(shape=(256, 512, 3))
 # learning to down sample
 lds_layer = conv_layer(input_layer, 'conv', 32, (3, 3), (2, 2)) # size = (1024, 512, 32)
 lds_layer = conv_layer(lds_layer, 'ds', 48, (3, 3), (2, 2)) # size = (512, 256, 48)
@@ -37,7 +33,7 @@ ffout_layer = conv_layer(ff_layer2, 'add', 0, (0, 0), (0, 0), add_layer=ff_layer
 # # classifier
 classifier_layer = conv_layer(ffout_layer, 'ds', 128, (3, 3), (1, 1))  # size = (256, 128, 128)
 classifier_layer = conv_layer(classifier_layer, 'ds', 128, (3, 3), (1, 1))  # size = (256, 128, 128)
-classifier_layer = conv_layer(classifier_layer, 'conv', 1, (1, 1), (1, 1))  # size = (256, 128, 1)
+classifier_layer = conv_layer(classifier_layer, 'conv', 21, (1, 1), (1, 1))  # size = (256, 128, 1)
 classifier_layer = tf.keras.layers.Dropout(0.3)(classifier_layer)
 classifier_layer = tf.keras.layers.UpSampling2D((8, 8))(classifier_layer)
 classifier_layer = tf.keras.activations.softmax(classifier_layer)
@@ -46,20 +42,15 @@ classifier_layer = tf.keras.activations.softmax(classifier_layer)
 fast_scnn_model = tf.keras.Model(inputs=input_layer, outputs=classifier_layer, name='Fast-SCNN')
 optimizer = tf.keras.optimizers.SGD(momentum=0.9, lr=0.045)
 fast_scnn_model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+fast_scnn_model.summary()
 # categorical_crossentropy
 # sparse_categorical_crossentropy
 
 
-# train_ds = get_tf_dataset('train')
-# val_ds = get_tf_dataset('val')
 
-train_gen = DataGen('train', batch_size=BATCH_SIZE)
-val_gen = DataGen('val', batch_size=BATCH_SIZE)
-test_gen = DataGen('test', batch_size=BATCH_SIZE)
-
-train_steps = len(train_gen)
-valid_steps = len(val_gen)
-
+train_gen = DataGen('train', batch_size=BATCH_SIZE, image_height=256, image_width=512)
+val_gen = DataGen('val', batch_size=BATCH_SIZE, image_height=256, image_width=512)
+# test_gen = DataGen('test', batch_size=BATCH_SIZE)
 
 
 # setting checkpoints
@@ -77,22 +68,6 @@ history = fast_scnn_model.fit_generator(train_gen,
                                         validation_steps=VAL_SAMPLES//BATCH_SIZE,
                                         verbose=1,
                                         callbacks=[cp_callback])
-
-
-
-
-
-# history = fast_scnn_model.fit(
-# 							train_ds,
-# 							epochs=NO_OF_EPOCHS,
-# 							steps_per_epoch=SAMPLES//BATCH_SIZE,
-# 							validation_data=val_ds,
-# 							validation_steps=VAL_SAMPLES//BATCH_SIZE,
-# 							callbacks=[cp_callback],
-# 							verbose=1)
-
-
-
 
 
 

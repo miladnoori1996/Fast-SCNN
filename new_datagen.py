@@ -1,4 +1,3 @@
-# curl -o new_datagen.py https://transfer.sh/4BBfJ/new_datagen.py
 import os
 import numpy as np
 import cv2
@@ -101,7 +100,7 @@ class DataGen(keras.utils.Sequence):
             image_path = self.train_ids[id_num]
             mask_path = self.mask_train_ids[id_num]
         elif mode == 'val':
-            image_path = self.val_ids_ids[id_num]
+            image_path = self.val_ids[id_num]
             mask_path = self.mask_train_ids[id_num]
         elif mode == 'test':
             image_path = self.test_ids[id_num]
@@ -110,8 +109,6 @@ class DataGen(keras.utils.Sequence):
             print("mode does not exist")
             return
 
-        print(image_path)
-        print(mask_path)
         _image = image.img_to_array(image.load_img(image_path, target_size=(self.image_height, self.image_width)))/255.
         _mask = image.img_to_array(image.load_img(mask_path, color_mode="grayscale", target_size=(self.image_height, self.image_width)))
         mask = np.zeros((_mask.shape[0], _mask.shape[1], 21))
@@ -160,6 +157,7 @@ class DataGen(keras.utils.Sequence):
                 mask[:,:,20] = np.logical_or(mask[:,:,20],(_mask[:,:,0]==i))
         return _image, mask
 
+
     def __getitem__(self, index):
         dic = {
             "train": self.train_ids,
@@ -167,43 +165,23 @@ class DataGen(keras.utils.Sequence):
             "test": self.test_ids
         }
         ids = dic[self.mode]
-        # if (index+1)*self.batch_size > len(ids):
-        #     self.batch_size = len(ids) - index*self.batch_size
+        if (index+1)*self.batch_size > len(ids):
+            self.batch_size = len(ids) - index*self.batch_size
         files_batch = ids[index*self.batch_size : (index+1)*self.batch_size]
         image = np.zeros((self.batch_size, self.image_height, self.image_width, 3))
         mask = np.zeros((self.batch_size, self.image_height, self.image_width, 21))
         count = 0
         for id_name in files_batch:
-            # print("getting in the loop : ", count)
             _img, _mask = self.__load__(ids.index(id_name))
             image[count] = _img
             mask[count] = _mask
             count += 1
         return image, mask
 
-    # def __getitem__(self, index):
-    #     dic = {
-    #         "train": self.train_ids,
-    #         "val": self.val_ids,
-    #         "test": self.test_ids
-    #     }
-    #     ids = dic[self.mode]
-    #     count = 0
-    #     while True:
-    #         img_batch = np.zeros((self.batch_size, self.image_height, self.image_width, 3))
-    #         mask_batch = np.zeros((self.batch_size, self.image_height, self.image_width, 1))
-    #         for i in range(count, count+self.batch_size):
-    #             img, mask = self.__load__(i)
-    #             img_batch[i-count] = img
-    #             mask_batch[i-count] = mask
-    #         count += self.batch_size
-    #         if (count >= len(ids)):
-    #             count = 0
-    #         yield img_batch, mask_batch
-
 
     def on_epoch_end(self):
         pass
+
 
     def __len__(self):
         mode = self.mode
@@ -221,37 +199,11 @@ class DataGen(keras.utils.Sequence):
 
 
 
-dg = DataGen('train', batch_size=2)
-i, m = dg.__getitem__(2)
-print(m[0][:,:,0].shape)
-print(type(m))
-cvuint8 = cv2.convertScaleAbs(m[0][:,:,4])
-for i in range(0, 21):
-    print(np.unique(m[0][:,:,i]))
-
-
-# cvuint8 = cv2.convertScaleAbs(i[0])
-# cv2.imshow("hi", cvuint8)
-# cv2.waitKey(0)
-
-# for i,m in dg.__getitem__(0):
-#     print(i.shape)
-#     print(type(i))
-
-#     print(m.shape)
-#     print(type(m))
-#     cvuint8 = cv2.convertScaleAbs(m[0])
-#     cv2.imshow("hi", cvuint8)
-#     cv2.waitKey(0)
-
-
-# print(i.shape)
-# print(m.shape)
-# print(np.unique(m[1]))
-# cvuint8 = cv2.convertScaleAbs(m[0])
-# cv2.imshow("hi", cvuint8)
-# cv2.waitKey(0)
-
-
-
+# dg = DataGen('train', batch_size=2, split=True, amount=10)
+# i, m = dg.__getitem__(12)
+# print(m[0][:,:,0].shape)
+# print(type(m))
+# cvuint8 = cv2.convertScaleAbs(m[0][:,:,4])
+# for i in range(0, 21):
+#     print(np.unique(m[0][:,:,i]))
 

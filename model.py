@@ -25,14 +25,14 @@ def conv_layer(input_layer, conv_type, filters, kernel_size, strides, padding='s
     if conv_type == 'ds':
         x = tf.keras.layers.SeparableConv2D(filters, kernel_size, strides, padding=padding)(input_layer)
     elif conv_type == 'dw':
-        x = ff_layer2 = tf.keras.layers.DepthwiseConv2D(filters, strides, depth_multiplier=1, padding=padding)(input_layer)
+        x = tf.keras.layers.DepthwiseConv2D(filters, strides, depth_multiplier=1, padding=padding)(input_layer)
     elif conv_type == 'add':
         x = tf.keras.layers.add([input_layer, add_layer])
     else:
         x = tf.keras.layers.Conv2D(filters, kernel_size, strides, padding=padding)(input_layer)
-    x = tf.keras.layers.BatchNormalization()(x)
     if relu:
         x = tf.keras.activations.relu(x)
+    x = tf.keras.layers.BatchNormalization()(x)
     return x
 
 
@@ -65,8 +65,8 @@ def bottelneck(input_layer, filters, kernel_size, expansion_factor, n, strides):
         tchannel = tf.keras.backend.int_shape(input_layer)[-1] * expansion_factor
         x = conv_layer(input_layer, 'conv', tchannel, (1, 1), strides=(1, 1))
         x = tf.keras.layers.DepthwiseConv2D(kernel_size, strides=strides, depth_multiplier=1, padding='same')(x)
-        x = tf.keras.layers.BatchNormalization()(x)
         x = tf.keras.activations.relu(x)
+        x = tf.keras.layers.BatchNormalization()(x)
         x = conv_layer(x, 'conv', filters, (1, 1), strides=(1, 1), padding='same', relu=False)
         if add:
             x = tf.keras.layers.add([x, input_layer])
@@ -89,12 +89,12 @@ def ppm(input_tensor, bin_sizes):
     """
     concat_list = [input_tensor]
     # for (1024, 2048)
-    w = 32
-    h = 64
+    # w = 32
+    # h = 64
 
     # for the new img size
-    # w = 8
-    # h = 16
+    w = 8
+    h = 16
 
     for bin_size in bin_sizes:
         x = tf.keras.layers.AveragePooling2D(pool_size=(w//bin_size, h//bin_size), strides=(w//bin_size, h//bin_size))(input_tensor)
@@ -102,3 +102,7 @@ def ppm(input_tensor, bin_sizes):
         x = tf.keras.layers.Lambda(lambda x: tf.image.resize(x, (w,h)))(x)
         concat_list.append(x)
     return tf.keras.layers.concatenate(concat_list)
+
+
+
+
